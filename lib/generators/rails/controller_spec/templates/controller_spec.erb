@@ -1,0 +1,141 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+# noinspection RubyResolve
+RSpec.describe Admin::<%= class_name.pluralize %>Controller, type: :controller do
+  render_views
+
+  let(:page) { Capybara::Node::Simple.new(response.body) }
+  let(:admin_user) { FactoryBot.create :admin_user }
+  before :each do sign_in admin_user end
+  let!(:<%= plural_name.singularize %>) { FactoryBot.create :<%= plural_name.singularize %> }
+  let(:valid_attributes) { FactoryBot.attributes_for :<%= plural_name.singularize %> }
+  let(:invalid_attributes) { { name: '' } }
+
+  describe '#GET index' do
+    subject { get :index }
+    it { is_expected.to be_success }
+    it 'assigns the <%= plural_name.singularize %>' do
+      get :index
+      expect(assigns(:<%= plural_name %>)).to include(<%= plural_name.singularize %>)
+    end
+    it 'should render the expected columns' do
+      get :index
+      expect(page).to have_content(<%= plural_name.singularize %>.id)
+    end
+    it 'filter Name works' do
+      matching_<%= plural_name.singularize %> = FactoryBot.create :<%= plural_name.singularize %>, name: 'ABCDEFG'
+      non_matching_<%= plural_name.singularize %> = FactoryBot.create :<%= plural_name.singularize %>, name: 'HIJKLMN'
+      get :index, params: { q: { name_cont: 'BCDEF' } }
+      expect(assigns(:<%= plural_name %>)).to include(matching_<%= plural_name.singularize %>)
+      expect(assigns(:<%= plural_name %>)).not_to include(non_matching_<%= plural_name.singularize %>)
+    end
+  end
+
+  describe '#GET new' do
+    subject { get :new }
+    it { is_expected.to be_success }
+    it 'assigns the <%= plural_name.singularize %>' do
+      get :new
+      expect(assigns(:<%= plural_name.singularize %>)).to be_a_new(<%= class_name %>)
+    end
+  end
+
+  describe '#POST create' do
+    context 'with valid params' do
+      subject { -> { post :create, params: { <%= plural_name.singularize %>: valid_attributes } } }
+      it { is_expected.to change { <%= class_name %>.count }.by(1) }
+
+      it 'assigns a newly created <%= plural_name.singularize %> as @<%= plural_name.singularize %>' do
+        post :create, params: { <%= plural_name.singularize %>: valid_attributes }
+        expect(assigns(:<%= plural_name.singularize %>)).to be_a(<%= class_name %>)
+        expect(assigns(:<%= plural_name.singularize %>)).to be_persisted
+      end
+
+      it 'redirects to the created <%= plural_name.singularize %>' do
+        post :create, params: { <%= plural_name.singularize %>: valid_attributes }
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(admin_<%= plural_name.singularize %>_path(<%= class_name %>.last))
+      end
+
+      it 'should create the <%= plural_name.singularize %>' do
+        post :create, params: { <%= plural_name.singularize %>: valid_attributes }
+        <%= plural_name.singularize %> = <%= class_name %>.last
+        expect(<%= plural_name.singularize %>.name).to eq(valid_attributes[:name])
+      end
+    end
+
+    context 'with invalid params' do
+      subject { -> { post :create, params: { <%= plural_name.singularize %>: invalid_attributes } } }
+      it 'assigns a newly created but unsaved <%= plural_name.singularize %> as @<%= plural_name.singularize %>' do
+        post :create, params: { <%= plural_name.singularize %>: invalid_attributes }
+        expect(assigns(:<%= plural_name.singularize %>)).to be_a_new(<%= class_name %>)
+      end
+      it { is_expected.not_to change { <%= class_name %>.count } }
+    end
+  end
+
+  describe '#GET edit' do
+    subject { get :edit, params: { id: <%= plural_name.singularize %>.id } }
+    it { is_expected.to be_success }
+    it 'assigns the <%= plural_name.singularize %>' do
+      get :edit, params: { id: <%= plural_name.singularize %>.id }
+      expect(assigns(:<%= plural_name.singularize %>)).to eq(<%= plural_name.singularize %>)
+    end
+  end
+
+  describe '#PUT update' do
+    context 'with valid params' do
+      before do
+        put :update, params: { id: <%= plural_name.singularize %>.id, <%= plural_name.singularize %>: valid_attributes }
+      end
+      it 'assigns the <%= plural_name.singularize %>' do
+        expect(assigns(:<%= plural_name.singularize %>)).to eq(<%= plural_name.singularize %>)
+      end
+      it 'returns http redirect' do
+        expect(response).to have_http_status(:redirect)
+        expect(response).to redirect_to(admin_<%= plural_name.singularize %>_path(<%= plural_name.singularize %>))
+      end
+      it 'should update the <%= plural_name.singularize %>' do
+        <%= plural_name.singularize %>.reload
+        expect(<%= plural_name.singularize %>.name).to eq(valid_attributes[:name])
+      end
+    end
+    context 'with invalid params' do
+      it 'returns http success' do
+        put :update, params: { id: <%= plural_name.singularize %>.id, <%= plural_name.singularize %>: invalid_attributes }
+        expect(response).to have_http_status(:success)
+      end
+      it 'does not change <%= plural_name.singularize %>' do
+        expect do
+          put :update, params: { id: <%= plural_name.singularize %>.id, <%= plural_name.singularize %>: invalid_attributes }
+        end.not_to change { <%= plural_name.singularize %>.reload.name }
+      end
+    end
+  end
+
+  describe '#GET show' do
+    before do
+      get :show, params: { id: <%= plural_name.singularize %>.id }
+    end
+    it 'returns http success' do
+      expect(response).to have_http_status(:success)
+    end
+    it 'assigns the <%= plural_name.singularize %>' do
+      expect(assigns(:<%= plural_name.singularize %>)).to eq(<%= plural_name.singularize %>)
+    end
+    it 'should render the form elements' do
+      expect(page).to have_content(<%= plural_name.singularize %>.name)
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    subject { -> { delete :destroy, params: { id: <%= plural_name.singularize %>.id } } }
+    it { is_expected.to change { <%= class_name %>.count }.by(-1) }
+    it 'redirects to the field' do
+      delete :destroy, params: { id: <%= plural_name.singularize %>.id }
+      expect(response).to redirect_to(admin_<%= plural_name %>_path)
+    end
+  end
+end

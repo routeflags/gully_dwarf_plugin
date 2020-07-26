@@ -1,0 +1,37 @@
+# frozen_string_literal: true
+
+ActiveAdmin.register <%= class_name %> do
+  permit_params { <%= class_name %>.attribute_names.map(&:to_sym) }
+  csv { <%= class_name %>.attribute_names.map { |x| column(x) { |v| v.send(x) } } }
+  config.breadcrumb = false
+  active_admin_import validate: true
+  index do
+    selectable_column
+    id_column
+    <% eval(class_name).attribute_names.each do |x| -%>
+      <% next if x == 'id' -%>
+      column :<%= x.to_sym %>
+    <% end -%>
+    actions
+  end
+  <% eval(class_name).attribute_names.each do |x| -%>
+    filter :<%= x.to_sym %>
+  <% end -%>
+  show do
+    attributes_table do
+      <% eval(class_name).attribute_names.each do |x| -%>
+        row :<%= x.to_sym %>
+      <% end -%>
+    end
+    active_admin_comments
+  end
+  form do |f|
+    f.inputs do
+      <% eval(class_name).attribute_names.each do |x| -%>
+        <% next if x == 'id' || x == 'created_at' || x == 'updated_at'-%>
+        f.input :<%= x.to_sym %>
+      <% end -%>
+    end
+    f.actions
+  end
+end

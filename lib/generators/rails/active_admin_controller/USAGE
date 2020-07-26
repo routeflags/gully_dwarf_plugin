@@ -1,0 +1,16 @@
+Description:
+    active admin controller generator
+
+Example:
+    bin/rails generate active_admin_controller Thing
+
+    This will create:
+        app/admin
+
+Develop
+```
+class_name	Thing
+class_name.pluralize	Things
+plural_name	things
+plural_name.singularize	thing
+```

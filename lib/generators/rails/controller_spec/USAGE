@@ -1,0 +1,17 @@
+Description:
+    Spec controller generator
+
+Example:
+    bin/rails generate controller_spec Thing
+
+    This will create:
+        spec/controllers/admin
+
+    bin/rails generate generator rails/controller_spec
+
+```
+class_name	Thing
+class_name.pluralize	Things
+plural_name	things
+plural_name.singularize	thing
+```
